@@ -1,0 +1,221 @@
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion> 
+
+  <groupId>test</groupId> 
+  <artifactId>test</artifactId> 
+  <packaging>jar</packaging> 
+  <version>1.0-SNAPSHOT</version> 
+  <name>test</name> 
+
+  <properties> 
+    <lwjgl.version>2.1.0</lwjgl.version> 
+    <phys2D.version>060408</phys2D.version> 
+    <platform>mac</platform>
+    <junit.version>3.8.1</junit.version>
+
+    <!-- Clojure 1.0, in Maven Central
+    <clojure.version>1.0.0</clojure.version>
+    <clojure.artifact.id>clojure</clojure.artifact.id>
+    -->
+    <!-- Alternate for Clojure 1.1 development snapshot: -->
+    <clojure.version>1.1.0-alpha-SNAPSHOT</clojure.version>
+    <clojure.artifactId>clojure-lang</clojure.artifactId>
+
+    <clojure-contrib.version>1.0-SNAPSHOT</clojure-contrib.version>
+  </properties> 
+
+  <dependencyManagement> 
+    <dependencies> 
+
+      <dependency> 
+        <groupId>org.lwjgl</groupId> 
+        <artifactId>lwjgl-native</artifactId> 
+        <version>${lwjgl.version}</version> 
+        <classifier>${platform}</classifier> 
+      </dependency> 
+
+    </dependencies> 
+  </dependencyManagement> 
+
+  <dependencies> 
+
+    <dependency> 
+      <groupId>slick</groupId> 
+      <artifactId>slick</artifactId> 
+      <version>269</version> 
+    </dependency> 
+
+    <dependency> 
+      <groupId>org.lwjgl</groupId> 
+      <artifactId>lwjgl-native</artifactId> 
+      <classifier>mac</classifier> 
+    </dependency> 
+
+    <dependency> 
+      <groupId>org.lwjgl</groupId> 
+      <artifactId>lwjgl-native</artifactId> 
+      <version>${lwjgl.version}</version> 
+      <classifier>linux32</classifier> 
+    </dependency> 
+
+    <dependency> 
+      <groupId>org.lwjgl</groupId> 
+      <artifactId>lwjgl-native</artifactId> 
+      <version>${lwjgl.version}</version> 
+      <classifier>win32</classifier> 
+    </dependency> 
+
+    <dependency> 
+      <groupId>junit</groupId> 
+      <artifactId>junit</artifactId> 
+      <version>${junit.version}</version> 
+      <scope>test</scope> 
+    </dependency> 
+
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>${clojure.artifactId}</artifactId>
+      <version>${clojure.version}</version>
+    </dependency>
+
+    <!-- Clojure-contrib snapshot: -->
+    <dependency>
+      <groupId>org.clojure</groupId>
+      <artifactId>clojure-contrib</artifactId>
+      <version>${clojure-contrib.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>jline</groupId>
+      <artifactId>jline</artifactId>
+      <version>0.9.94</version>
+    </dependency>
+
+  </dependencies> 
+
+  <build> 
+
+    <plugins> 
+
+      <plugin> 
+        <groupId>org.apache.maven.plugins</groupId> 
+        <artifactId>maven-compiler-plugin</artifactId> 
+        <configuration> 
+          <source>1.5</source> 
+          <target>1.5</target> 
+        </configuration> 
+      </plugin> 
+
+
+      <plugin> 
+        <groupId>org.apache.maven.plugins</groupId> 
+        <artifactId>maven-dependency-plugin</artifactId> 
+        <configuration> 
+          <artifactItems> 
+            <artifactItem> 
+              <groupId>org.lwjgl</groupId> 
+              <artifactId>lwjgl-native</artifactId> 
+              <version>${lwjgl.version}</version> 
+              <type>jar</type> 
+              <classifier>${platform}</classifier> 
+              <outputDirectory>${project.build.directory}/natives</outputDirectory> 
+              <overWrite>true</overWrite> 
+            </artifactItem> 
+          </artifactItems> 
+        </configuration> 
+        <executions> 
+          <execution> 
+            <id>unpack</id> 
+            <phase>generate-resources</phase> 
+            <goals> 
+              <goal>unpack</goal> 
+            </goals> 
+          </execution> 
+        </executions> 
+      </plugin> 
+
+
+      <plugin>
+        <groupId>com.theoryinpractise</groupId>
+        <artifactId>clojure-maven-plugin</artifactId>
+        <version>1.1</version>
+        <configuration>
+          <testScript>src/scripts/test.clj</testScript>
+          <script>src/scripts/run.clj</script>
+        </configuration>
+        <executions>
+          <execution>
+            <id>compile-clojure</id>
+            <phase>compile</phase>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>test-cljoure</id>
+            <phase>test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- 
+           http://mojo.codehaus.org/exec-maven-plugin/usage.html
+           mvn exec:java
+      -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.1</version>
+        <configuration>
+          <mainClass>app</mainClass>
+        </configuration>
+      </plugin>
+
+    </plugins> 
+
+  </build> 
+
+  <repositories> 
+
+    <repository> 
+      <id>b2s-repo</id> 
+      <url>http://b2s-repo.googlecode.com/svn/trunk/mvn-repo</url> 
+    </repository> 
+
+    <repository> 
+      <id>freehep</id> 
+      <url>http://java.freehep.org/maven2</url> 
+    </repository> 
+
+    <repository> 
+      <id>slick-repo</id> 
+      <url>http://slick.cokeandcode.com/mavenrepo</url> 
+    </repository> 
+
+    <repository>
+      <id>tapestry.formos.com</id>
+      <name>Formos Software snapshot repository</name>
+      <url>http://tapestry.formos.com/maven-snapshot-repository</url>
+    </repository>
+
+    <!-- For clojure-lang & clojure-contrib snapshots: -->
+    <repository>
+      <id>formos</id>
+      <name>Formos Software snapshot repository</name>
+      <url>http://tapestry.formos.com/maven-snapshot-repository</url>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+
+
+  </repositories> 
+
+
+</project> 
